@@ -336,7 +336,11 @@ export default class {
           case "onmessage":
             //attempt to parse the message...
             try {
-              let parsed: undefined | {} | WebSocketResponseBody = JSON.parse(event);
+
+              let parsed: string | undefined | {} | WebSocketResponseBody = event;
+              if (typeof parsed === "string") {
+                parsed = JSON.parse(event);
+              }
               console.log("Got message", parsed);
               if (parsed && parsed.hasOwnProperty("messageType") && parsed.hasOwnProperty("id") &&
                 typeof (<WebSocketResponseBody>parsed).id === "string" && (<WebSocketResponseBody>parsed).id !== "") {
@@ -360,7 +364,7 @@ export default class {
                 Emitter.emit("onobject", parsed);
               }
             } catch (ex) {
-              console.log("Error Processing inbound message", ex);
+              console.log("Error Processing inbound message", ex, event);
               ex.payload = event;
               Emitter.emit("onerror", ex);
               return;

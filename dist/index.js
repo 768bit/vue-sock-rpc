@@ -697,7 +697,10 @@ var default_1$3 = /** @class */ (function () {
                     case "onmessage":
                         //attempt to parse the message...
                         try {
-                            var parsed = JSON.parse(event);
+                            var parsed = event;
+                            if (typeof parsed === "string") {
+                                parsed = JSON.parse(event);
+                            }
                             console.log("Got message", parsed);
                             if (parsed && parsed.hasOwnProperty("messageType") && parsed.hasOwnProperty("id") &&
                                 typeof parsed.id === "string" && parsed.id !== "") {
@@ -723,7 +726,7 @@ var default_1$3 = /** @class */ (function () {
                             }
                         }
                         catch (ex) {
-                            console.log("Error Processing inbound message", ex);
+                            console.log("Error Processing inbound message", ex, event);
                             ex.payload = event;
                             Emitter$1.emit("onerror", ex);
                             return;
