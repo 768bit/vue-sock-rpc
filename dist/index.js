@@ -119,6 +119,43 @@ var default_1 = /** @class */ (function () {
             anHttpRequest.send(null);
         });
     };
+    default_1.post = function (url, payload) {
+        return new Promise$1(function (resolve, reject) {
+            var anHttpRequest = new XMLHttpRequest();
+            anHttpRequest.onreadystatechange = function () {
+                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200) {
+                    resolve(anHttpRequest.responseText);
+                }
+                else {
+                    reject(anHttpRequest.responseText);
+                }
+            };
+            anHttpRequest.open("POST", url, true);
+            anHttpRequest.send(payload);
+        });
+    };
+    default_1.postJSON = function (url, payload) {
+        return new Promise$1(function (resolve, reject) {
+            var anHttpRequest = new XMLHttpRequest();
+            anHttpRequest.withCredentials = true;
+            anHttpRequest.onreadystatechange = function () {
+                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200) {
+                    try {
+                        var parsed = JSON.parse(anHttpRequest.responseText);
+                        resolve(parsed);
+                    }
+                    catch (ex) {
+                        reject(ex);
+                    }
+                }
+                else {
+                    reject(anHttpRequest.responseText);
+                }
+            };
+            anHttpRequest.open("POST", url, true);
+            anHttpRequest.send(payload);
+        });
+    };
     return default_1;
 }());
 
@@ -507,7 +544,7 @@ var default_1$3 = /** @class */ (function () {
     default_1$$1.prototype.startSession = function () {
         var _this = this;
         //start by getting the JWTTicket from the auth handler...
-        return default_1.getJSON("/_auth/_jwtAuth").then(function (response) {
+        return default_1.postJSON("/_auth/_jwtAuth", {}).then(function (response) {
             //check the response for the tickets etc...
             if (response && response.hasOwnProperty("userUUID") && response.hasOwnProperty("jwtTicketID") &&
                 typeof response.userUUID === "string" && response.userUUID !== "" &&

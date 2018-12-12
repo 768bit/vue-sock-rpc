@@ -130,7 +130,7 @@ export default class {
 
   startSession(): Promise<any> {
     //start by getting the JWTTicket from the auth handler...
-    return HttpClient.getJSON("/_auth/_jwtAuth").then((response: any) => {
+    return HttpClient.postJSON("/_auth/_jwtAuth", {}).then((response: any) => {
 
       //check the response for the tickets etc...
 
