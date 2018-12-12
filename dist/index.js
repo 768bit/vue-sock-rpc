@@ -699,7 +699,10 @@ var default_1$3 = /** @class */ (function () {
                         try {
                             var parsed = event;
                             if (typeof parsed === "string") {
-                                parsed = JSON.parse(event);
+                                parsed = JSON.parse(parsed);
+                            }
+                            else if (parsed.hasOwnProperty("data") && typeof parsed.data === "string") {
+                                parsed = JSON.parse(parsed.data);
                             }
                             console.log("Got message", parsed);
                             if (parsed && parsed.hasOwnProperty("messageType") && parsed.hasOwnProperty("id") &&
