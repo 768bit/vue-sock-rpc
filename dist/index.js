@@ -1,7 +1,9 @@
 'use strict';
 
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
 var Promise$1 = require('bluebird');
-var shortid = require('shortid');
+var ShortUniqueId = _interopDefault(require('short-unique-id'));
 
 var Emitter = /** @class */ (function () {
     function Emitter() {
@@ -265,6 +267,7 @@ var default_1$2 = /** @class */ (function (_super) {
     return default_1;
 }(Error));
 
+var UUID = new ShortUniqueId();
 var WebSocketRequest = /** @class */ (function () {
     function WebSocketRequest(messageType) {
         this.wasCancelled = false;
@@ -277,7 +280,7 @@ var WebSocketRequest = /** @class */ (function () {
             self.resolver = resolve;
             self.rejecter = reject;
         });
-        this.id = shortid.generate();
+        this.id = UUID.randomUUID(12);
         this.reqObject = {
             messageType: WebSocketMessageType.RPCMessage,
             id: this.id

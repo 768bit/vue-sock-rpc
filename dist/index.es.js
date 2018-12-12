@@ -1,6 +1,6 @@
 import * as Promise$1 from 'bluebird';
 import { resolve, each, reject } from 'bluebird';
-import { generate } from 'shortid';
+import ShortUniqueId from 'short-unique-id';
 
 var Emitter = /** @class */ (function () {
     function Emitter() {
@@ -264,6 +264,7 @@ var default_1$2 = /** @class */ (function (_super) {
     return default_1;
 }(Error));
 
+var UUID = new ShortUniqueId();
 var WebSocketRequest = /** @class */ (function () {
     function WebSocketRequest(messageType) {
         this.wasCancelled = false;
@@ -276,7 +277,7 @@ var WebSocketRequest = /** @class */ (function () {
             self.resolver = resolve$$1;
             self.rejecter = reject$$1;
         });
-        this.id = generate();
+        this.id = UUID.randomUUID(12);
         this.reqObject = {
             messageType: WebSocketMessageType.RPCMessage,
             id: this.id
