@@ -327,7 +327,7 @@ var WebSocketRequest = /** @class */ (function () {
         });
         this.id = UUID.randomUUID(12);
         this.reqObject = {
-            messageType: WebSocketMessageType.RPCMessage,
+            messageType: messageType,
             id: this.id
         };
     }
