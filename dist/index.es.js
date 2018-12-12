@@ -83,11 +83,13 @@ var default_1 = /** @class */ (function () {
         return new Promise$1(function (resolve$$1, reject$$1) {
             var anHttpRequest = new XMLHttpRequest();
             anHttpRequest.onreadystatechange = function () {
-                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200) {
-                    resolve$$1(anHttpRequest.responseText);
-                }
-                else {
-                    reject$$1(anHttpRequest.responseText);
+                if (anHttpRequest.readyState == 4) {
+                    if (anHttpRequest.status == 200) {
+                        resolve$$1(anHttpRequest.responseText);
+                    }
+                    else {
+                        reject$$1(anHttpRequest.responseText);
+                    }
                 }
             };
             anHttpRequest.open("GET", url, true);
@@ -99,17 +101,19 @@ var default_1 = /** @class */ (function () {
             var anHttpRequest = new XMLHttpRequest();
             anHttpRequest.withCredentials = true;
             anHttpRequest.onreadystatechange = function () {
-                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200) {
-                    try {
-                        var parsed = JSON.parse(anHttpRequest.responseText);
-                        resolve$$1(parsed);
+                if (anHttpRequest.readyState == 4) {
+                    if (anHttpRequest.status == 200) {
+                        try {
+                            var parsed = JSON.parse(anHttpRequest.responseText);
+                            resolve$$1(parsed);
+                        }
+                        catch (ex) {
+                            reject$$1(ex);
+                        }
                     }
-                    catch (ex) {
-                        reject$$1(ex);
+                    else {
+                        reject$$1(anHttpRequest.responseText);
                     }
-                }
-                else {
-                    reject$$1(anHttpRequest.responseText);
                 }
             };
             anHttpRequest.open("GET", url, true);
@@ -120,11 +124,13 @@ var default_1 = /** @class */ (function () {
         return new Promise$1(function (resolve$$1, reject$$1) {
             var anHttpRequest = new XMLHttpRequest();
             anHttpRequest.onreadystatechange = function () {
-                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200) {
-                    resolve$$1(anHttpRequest.responseText);
-                }
-                else {
-                    reject$$1(anHttpRequest.responseText);
+                if (anHttpRequest.readyState == 4) {
+                    if (anHttpRequest.status == 200) {
+                        resolve$$1(anHttpRequest.responseText);
+                    }
+                    else {
+                        reject$$1(anHttpRequest.responseText);
+                    }
                 }
             };
             anHttpRequest.open("POST", url, true);
@@ -136,17 +142,19 @@ var default_1 = /** @class */ (function () {
             var anHttpRequest = new XMLHttpRequest();
             anHttpRequest.withCredentials = true;
             anHttpRequest.onreadystatechange = function () {
-                if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200) {
-                    try {
-                        var parsed = JSON.parse(anHttpRequest.responseText);
-                        resolve$$1(parsed);
+                if (anHttpRequest.readyState == 4) {
+                    if (anHttpRequest.status == 200) {
+                        try {
+                            var parsed = JSON.parse(anHttpRequest.responseText);
+                            resolve$$1(parsed);
+                        }
+                        catch (ex) {
+                            reject$$1(ex);
+                        }
                     }
-                    catch (ex) {
-                        reject$$1(ex);
+                    else {
+                        reject$$1(anHttpRequest.responseText);
                     }
-                }
-                else {
-                    reject$$1(anHttpRequest.responseText);
                 }
             };
             anHttpRequest.open("POST", url, true);
