@@ -340,7 +340,7 @@ export default class {
               let parsed: string | undefined | {} | WebSocketResponseBody = event;
               if (typeof parsed === "string") {
                 parsed = JSON.parse(parsed);
-              } else if (parsed.hasOwnProperty("data") && typeof (<any>parsed).data === "string") {
+              } else if (parsed && (<any>parsed).data && typeof (<any>parsed).data === "string") {
                 parsed = JSON.parse((<any>parsed).data);
               }
               console.log("Got message", parsed);

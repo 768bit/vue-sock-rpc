@@ -701,7 +701,7 @@ var default_1$3 = /** @class */ (function () {
                             if (typeof parsed === "string") {
                                 parsed = JSON.parse(parsed);
                             }
-                            else if (parsed.hasOwnProperty("data") && typeof parsed.data === "string") {
+                            else if (parsed && parsed.data && typeof parsed.data === "string") {
                                 parsed = JSON.parse(parsed.data);
                             }
                             console.log("Got message", parsed);
