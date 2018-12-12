@@ -1,6 +1,6 @@
 {
   "name": "@768bit/vue-sock-rpc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Hard fork of nathantsoi/vue-native-websocket that supports scoped/namespaced message capture",
   "main": "dist/index.js",
   "files": [

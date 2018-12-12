@@ -25,8 +25,6 @@ export default {
       typescript: require('typescript'),
     }),
     nodeResolve({
-      module: true,
-      main: true,
       browser: true
     }),
     commonjs()
