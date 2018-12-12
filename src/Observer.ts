@@ -142,7 +142,7 @@ export default class {
 
         let req = WebSocketRequest.StartSession(response.userUUID, response.jwtTicketID);
 
-        return this.sendRequest(req).then((response: WebSocketResponseBody) => {
+        return this.sendRequest(req, true).then((response: WebSocketResponseBody) => {
 
           if (response && response.seshKey && response.seshKey !== "") {
 

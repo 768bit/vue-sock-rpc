@@ -559,7 +559,7 @@ var default_1$3 = /** @class */ (function () {
                 typeof response.jwtTicketID === "string" && response.jwtTicketID !== "") {
                 //now send the start session request...
                 var req = WebSocketRequest.StartSession(response.userUUID, response.jwtTicketID);
-                return _this.sendRequest(req).then(function (response) {
+                return _this.sendRequest(req, true).then(function (response) {
                     if (response && response.seshKey && response.seshKey !== "") {
                         _this.seshKey = response.seshKey;
                         _this.isAuth = true;
