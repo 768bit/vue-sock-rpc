@@ -350,6 +350,10 @@ export default class {
                 if (Emitter.hasRequest((<WebSocketResponseBody>parsed).id)) {
                   let req = Emitter.getRequest((<WebSocketResponseBody>parsed).id);
                   if ((<WebSocketResponseBody>parsed).statusCode > WebSocketMessageStatus.RPCStatusOK) {
+                    if ((<WebSocketResponseBody>parsed).statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
+                      //try again!
+                      window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
+                    }
                     (<WebSocketRequest>req).reject(<WebSocketResponseBody>parsed);
                   } else {
                     console.log("Resolving Response");

@@ -707,6 +707,10 @@ var default_1$3 = /** @class */ (function () {
                                 if (Emitter$1.hasRequest(parsed.id)) {
                                     var req = Emitter$1.getRequest(parsed.id);
                                     if (parsed.statusCode > WebSocketMessageStatus.RPCStatusOK) {
+                                        if (parsed.statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
+                                            //try again!
+                                            window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
+                                        }
                                         req.reject(parsed);
                                     }
                                     else {
