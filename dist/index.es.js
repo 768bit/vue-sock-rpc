@@ -517,6 +517,7 @@ var default_1$3 = /** @class */ (function () {
             }
             var rq = this.requestQueue.dequeueAll();
             if (Array.isArray(rq) && rq.length > 0) {
+                console.log("Processing WebSocket Queue");
                 this.processingQueue = true;
                 return each(rq, function (item) {
                     if (item.reqID && item.reqID !== "" && Emitter$1.hasRequest(item.reqID)) {
@@ -540,6 +541,7 @@ var default_1$3 = /** @class */ (function () {
                 }).catch(function (ex) {
                     return;
                 }).finally(function () {
+                    console.log("Completed Processing WebSocket Queue");
                     _this.processingQueue = false;
                 }).thenReturn();
             }
@@ -583,6 +585,7 @@ var default_1$3 = /** @class */ (function () {
                 _this.opts.$setInstance(event.currentTarget);
                 _this.reconnectionCount = 0;
             }
+            console.log("WebSocket Connection Ready");
             Emitter$1.emit("onopen", event);
         });
     };
@@ -592,6 +595,7 @@ var default_1$3 = /** @class */ (function () {
         if (this.reconnection) {
             this.reconnect();
         }
+        console.log("WebSocket Connection Disconnected");
         Emitter$1.emit("onclose", event);
     };
     default_1$$1.prototype.sendMessage = function (msg, dontQueue) {
@@ -618,11 +622,13 @@ var default_1$3 = /** @class */ (function () {
                 return req.internalPromise;
             }
             Emitter$1.addRequest(req);
+            console.log("Queueing Request", req.id);
             this.requestQueue.enqueue({ reqID: req.id });
         }
         else {
             Emitter$1.addRequest(req);
             this.processQueue().then(function () {
+                console.log("Sending Request", req.id);
                 _this.WebSocket.send(req.makeMessage());
             });
         }

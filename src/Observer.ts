@@ -78,6 +78,8 @@ export default class {
 
       if (Array.isArray(rq) && rq.length > 0) {
 
+        console.log("Processing WebSocket Queue");
+
         this.processingQueue = true;
         return Promise.each(rq, (item: { msg?: string, reqID?: string }) => {
 
@@ -115,6 +117,8 @@ export default class {
           return;
 
         }).finally(() => {
+
+          console.log("Completed Processing WebSocket Queue");
 
           this.processingQueue = false;
 
@@ -186,6 +190,8 @@ export default class {
         this.reconnectionCount = 0;
       }
 
+      console.log("WebSocket Connection Ready");
+
       Emitter.emit("onopen", event);
 
     });
@@ -199,6 +205,8 @@ export default class {
     if (this.reconnection) {
       this.reconnect();
     }
+
+    console.log("WebSocket Connection Disconnected");
 
     Emitter.emit("onclose", event);
 
@@ -237,6 +245,8 @@ export default class {
 
       Emitter.addRequest(req);
 
+      console.log("Queueing Request", req.id);
+
       this.requestQueue.enqueue({reqID: req.id});
 
     } else {
@@ -244,6 +254,8 @@ export default class {
       Emitter.addRequest(req);
 
       this.processQueue().then(() => {
+
+        console.log("Sending Request", req.id);
 
         this.WebSocket.send(req.makeMessage());
 
