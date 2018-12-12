@@ -563,6 +563,7 @@ var default_1$3 = /** @class */ (function () {
                 var req = WebSocketRequest.StartSession(response.userUUID, response.jwtTicketID);
                 return _this.sendRequest(req, true).then(function (response) {
                     if (response && response.seshKey && response.seshKey !== "") {
+                        console.log("Setting Session Key");
                         _this.seshKey = response.seshKey;
                         _this.isAuth = true;
                     }
@@ -697,6 +698,7 @@ var default_1$3 = /** @class */ (function () {
                         //attempt to parse the message...
                         try {
                             var parsed = JSON.parse(event);
+                            console.log("Got message", parsed);
                             if (parsed && parsed.hasOwnProperty("messageType") && parsed.hasOwnProperty("id") &&
                                 typeof parsed.id === "string" && parsed.id !== "") {
                                 if (Emitter$1.hasRequest(parsed.id)) {
@@ -705,22 +707,23 @@ var default_1$3 = /** @class */ (function () {
                                         req.reject(parsed);
                                     }
                                     else {
+                                        console.log("Resolving Response");
                                         req.resolve(parsed);
                                     }
-                                    return;
-                                }
-                                //were unable to parse the request... pass the parsed item down to anything that is subscribed for onobject or onmessage events...
-                                if (_this.store) {
-                                    _this.passToStore('SOCKET_' + eventType, event);
-                                }
-                                else {
-                                    Emitter$1.emit("onmessage", event);
-                                    Emitter$1.emit("onobject", parsed);
                                 }
                                 return;
                             }
+                            //were unable to parse the request... pass the parsed item down to anything that is subscribed for onobject or onmessage events...
+                            if (_this.store) {
+                                _this.passToStore('SOCKET_' + eventType, event);
+                            }
+                            else {
+                                Emitter$1.emit("onmessage", event);
+                                Emitter$1.emit("onobject", parsed);
+                            }
                         }
                         catch (ex) {
+                            console.log("Error Processing inbound message", ex);
                             ex.payload = event;
                             Emitter$1.emit("onerror", ex);
                             return;

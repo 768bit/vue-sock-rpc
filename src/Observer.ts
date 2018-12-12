@@ -150,6 +150,8 @@ export default class {
 
           if (response && response.seshKey && response.seshKey !== "") {
 
+            console.log("Setting Session Key");
+
             this.seshKey = response.seshKey;
             this.isAuth = true;
 
@@ -335,6 +337,7 @@ export default class {
             //attempt to parse the message...
             try {
               let parsed: undefined | {} | WebSocketResponseBody = JSON.parse(event);
+              console.log("Got message", parsed);
               if (parsed && parsed.hasOwnProperty("messageType") && parsed.hasOwnProperty("id") &&
                 typeof (<WebSocketResponseBody>parsed).id === "string" && (<WebSocketResponseBody>parsed).id !== "") {
 
@@ -343,20 +346,21 @@ export default class {
                   if ((<WebSocketResponseBody>parsed).statusCode > WebSocketMessageStatus.RPCStatusOK) {
                     (<WebSocketRequest>req).reject(<WebSocketResponseBody>parsed);
                   } else {
+                    console.log("Resolving Response");
                     (<WebSocketRequest>req).resolve(<WebSocketResponseBody>parsed);
                   }
-                  return;
-                }
-                //were unable to parse the request... pass the parsed item down to anything that is subscribed for onobject or onmessage events...
-                if (this.store) {
-                  this.passToStore('SOCKET_' + eventType, event);
-                } else {
-                  Emitter.emit("onmessage", event);
-                  Emitter.emit("onobject", parsed);
                 }
                 return;
               }
+              //were unable to parse the request... pass the parsed item down to anything that is subscribed for onobject or onmessage events...
+              if (this.store) {
+                this.passToStore('SOCKET_' + eventType, event);
+              } else {
+                Emitter.emit("onmessage", event);
+                Emitter.emit("onobject", parsed);
+              }
             } catch (ex) {
+              console.log("Error Processing inbound message", ex);
               ex.payload = event;
               Emitter.emit("onerror", ex);
               return;
