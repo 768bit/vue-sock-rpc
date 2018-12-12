@@ -52,7 +52,7 @@ export default class {
 
   }
 
-  public static post(url: string, payload:any): Promise<string> {
+  public static post(url: string, payload:string): Promise<string> {
 
     return new Promise((resolve, reject) => {
 
@@ -96,7 +96,7 @@ export default class {
       };
 
       anHttpRequest.open("POST", url, true);
-      anHttpRequest.send(payload);
+      anHttpRequest.send(JSON.stringify(payload));
 
     });
 

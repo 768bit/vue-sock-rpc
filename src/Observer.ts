@@ -163,6 +163,12 @@ export default class {
 
       }
 
+    }).catch((ex) => {
+
+      window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
+
+      throw ex;
+
     });
 
   }
