@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise$1 = require('bluebird');
-var UUID = require('uuid');
+var shortid = require('shortid');
 
 var Emitter = /** @class */ (function () {
     function Emitter() {
@@ -277,7 +277,7 @@ var WebSocketRequest = /** @class */ (function () {
             self.resolver = resolve;
             self.rejecter = reject;
         });
-        this.id = UUID.v4();
+        this.id = shortid.generate();
         this.reqObject = {
             messageType: WebSocketMessageType.RPCMessage,
             id: this.id

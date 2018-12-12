@@ -1,6 +1,6 @@
 import * as Promise$1 from 'bluebird';
 import { resolve, each, reject } from 'bluebird';
-import { v4 } from 'uuid';
+import { generate } from 'shortid';
 
 var Emitter = /** @class */ (function () {
     function Emitter() {
@@ -276,7 +276,7 @@ var WebSocketRequest = /** @class */ (function () {
             self.resolver = resolve$$1;
             self.rejecter = reject$$1;
         });
-        this.id = v4();
+        this.id = generate();
         this.reqObject = {
             messageType: WebSocketMessageType.RPCMessage,
             id: this.id

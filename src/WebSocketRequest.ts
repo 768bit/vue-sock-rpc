@@ -1,6 +1,6 @@
 import {WebSocketMessageType, WebSocketRequestBody, WebSocketResponseBody} from './types';
 import * as Promise from 'bluebird';
-import * as UUID from "uuid";
+import * as shortid from "shortid";
 import WebSocketError from "./WebSocketError";
 import WebSocketRequestCancelledError from "./WebSocketRequestCancelledError";
 
@@ -112,7 +112,7 @@ class WebSocketRequest {
 
     });
 
-    this.id = UUID.v4();
+    this.id = shortid.generate();
 
     this.reqObject = {
       messageType: WebSocketMessageType.RPCMessage,
