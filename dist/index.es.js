@@ -498,6 +498,7 @@ var default_1$3 = /** @class */ (function () {
         this.queueEnabled = true;
         this.processingQueue = false;
         this.isAuth = false;
+        this.sessionReady = true;
         if (connectionUrl.startsWith('//')) {
             var scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
             connectionUrl = scheme + "://" + connectionUrl;
@@ -576,6 +577,7 @@ var default_1$3 = /** @class */ (function () {
                         console.log("Setting Session Key");
                         _this.seshKey = response.seshKey;
                         _this.isAuth = true;
+                        _this.sessionReady = true;
                     }
                 });
             }
@@ -608,6 +610,8 @@ var default_1$3 = /** @class */ (function () {
     };
     default_1$$1.prototype.onDisconnected = function (event) {
         this.isAuth = false;
+        this.sessionReady = false;
+        this.seshKey = "";
         this.status = WebSocketConnectionStatus.Disconnected;
         if (this.reconnection) {
             this.reconnect();
@@ -633,7 +637,7 @@ var default_1$3 = /** @class */ (function () {
         if (this.isAuth && this.seshKey && this.seshKey !== "") {
             req.setSeshKey(this.seshKey);
         }
-        if (!dontQueue && this.queueEnabled && this.status !== WebSocketConnectionStatus.Connected) {
+        if (!dontQueue && this.queueEnabled && (this.status !== WebSocketConnectionStatus.Connected || !this.sessionReady)) {
             if (!req.queueable) {
                 req.cancel();
                 return req.internalPromise;

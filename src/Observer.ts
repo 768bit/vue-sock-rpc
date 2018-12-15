@@ -28,6 +28,7 @@ export default class {
   store: any;
   mutations: any;
   isAuth: boolean = false;
+  sessionReady: boolean = true;
   private seshKey: string;
   private requestQueue: Queue;
 
@@ -154,6 +155,7 @@ export default class {
 
             this.seshKey = response.seshKey;
             this.isAuth = true;
+            this.sessionReady = true;
 
           }
 
@@ -209,6 +211,8 @@ export default class {
   private onDisconnected(event: any) {
 
     this.isAuth = false;
+    this.sessionReady = false;
+    this.seshKey = "";
     this.status = WebSocketConnectionStatus.Disconnected;
     if (this.reconnection) {
       this.reconnect();
@@ -244,7 +248,7 @@ export default class {
       req.setSeshKey(this.seshKey);
     }
 
-    if (!dontQueue && this.queueEnabled && this.status !== WebSocketConnectionStatus.Connected) {
+    if (!dontQueue && this.queueEnabled && (this.status !== WebSocketConnectionStatus.Connected || !this.sessionReady)) {
 
       if (!req.queueable) {
         req.cancel();

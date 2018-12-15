@@ -20,6 +20,7 @@ export default class {
     store: any;
     mutations: any;
     isAuth: boolean;
+    sessionReady: boolean;
     private seshKey;
     private requestQueue;
     constructor(connectionUrl: string, opts?: any);
