@@ -3,6 +3,7 @@ enum WebSocketMessageType {
   RPCSessionStartMessage = 0x01,
   RPCSessionEndMessage = 0x04,
   RPCMessage = 0x20,
+  RPCStatusMessage = 0x22,
   HTTPMessage = 0x40,
   ByteSessionStartMessage = 0xB0,
   ByteSessionEndMessage = 0xB4,
@@ -18,6 +19,8 @@ function WebSocketMessageTypeToString(messageType: WebSocketMessageType): string
       return "ServerHello";
     case WebSocketMessageType.RPCMessage:
       return "RPC";
+    case WebSocketMessageType.RPCStatusMessage:
+      return "RPCStatus";
     case WebSocketMessageType.BasicMessage:
       return "Basic";
     case WebSocketMessageType.HTTPMessage:
@@ -72,9 +75,9 @@ declare type WebSocketRequestBody = {
   moduleURI?: string
   id: string
   seshKey?: string
-  headers?: Map<string, string>
+  headers?: any
   payload?: any
-  options?: Map<string, any>
+  options?: any
 }
 
 

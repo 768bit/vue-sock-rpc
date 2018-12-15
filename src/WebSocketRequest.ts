@@ -5,6 +5,11 @@ import WebSocketError from "./WebSocketError";
 import WebSocketRequestCancelledError from "./WebSocketRequestCancelledError";
 const UUID = new ShortUniqueId();
 
+declare type WebSocketRequestOptions = {
+  RPCOptions?:any
+  StatusCallback: (req:WebSocketRequest, message:WebSocketResponseBody) => void
+}
+
 class WebSocketRequest {
 
   messageType: WebSocketMessageType;
@@ -17,23 +22,26 @@ class WebSocketRequest {
   wasError: boolean = false;
   complete: boolean = false;
   queueable: boolean = true;
+  hasStatusHandler: boolean = false;
+  statusHandler: (req:WebSocketRequest, msg:WebSocketResponseBody) => void;
   private reqObject: WebSocketRequestBody;
   private resolver: (response: WebSocketResponseBody) => void;
   private rejecter: (ex: Error) => void;
 
   public static RPC(operation: string, payload: any): WebSocketRequest
-  public static RPC(operation: string, payload: any, moduleURI: string): WebSocketRequest
-  public static RPC(operation: string, payload: any, moduleURI: string, options?: Map<string, any>): WebSocketRequest
-  public static RPC(operation: string, payload: any, moduleURI: string, options: Map<string, any>): WebSocketRequest
-  public static RPC(operation: string, payload: any, moduleURI?: string, options?: Map<string, any>): WebSocketRequest {
+  public static RPC(operation: string, payload: any, options:WebSocketRequestOptions): WebSocketRequest
+  public static RPC(operation: string, payload: any, options?:WebSocketRequestOptions): WebSocketRequest {
     let req = new WebSocketRequest(WebSocketMessageType.RPCMessage);
     req.reqObject.cmd = operation;
     req.payload = payload;
-    if (moduleURI && moduleURI !== "") {
-      req.reqObject.moduleURI = moduleURI;
-    }
-    if (options && options instanceof Map && options.size > 0) {
-      req.reqObject.options = options;
+    if (options && Object.keys(options).length > 0) {
+      if (options.RPCOptions) {
+        req.reqObject.options = options.RPCOptions;
+      }
+      if (options.StatusCallback && typeof options.StatusCallback === "function") {
+        req.hasStatusHandler = true;
+        req.statusHandler = options.StatusCallback;
+      }
     }
     return req;
   }
@@ -147,6 +155,14 @@ class WebSocketRequest {
     this.seshKey = seshKey;
 
     return this;
+
+  }
+
+  processStatusMessage(message:WebSocketResponseBody) {
+
+    if (this.hasStatusHandler) {
+      this.statusHandler(this, message)
+    }
 
   }
 

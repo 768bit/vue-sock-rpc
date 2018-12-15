@@ -291,13 +291,21 @@ export default class {
         self.sendMessage(JSON.stringify(obj));
       }
     }
-    if (!('sendRPC' in this.WebSocket)) {
+    if (!('callRPC' in this.WebSocket)) {
       // @ts-ignore
-      this.WebSocket.sendRPC = function (cmd: string, payload: string, moduleURI: string = "", options: Map<string, any> = new Map<string, any>()): Promise<any> {
+      this.WebSocket.callRPC = function (cmd: string, payload: string, options?:WebSocketRequestOptions): Promise<any> {
 
         //create the request object so we can get an id...
 
-        let req = WebSocketRequest.RPC(cmd, payload, moduleURI, options);
+        let req = WebSocketRequest.RPC(cmd, payload, options);
+
+        //if the request haas a status handler we need to register that - this will also be passed to the server to let it know this client is "subscribed"....
+
+        if (req.hasStatusHandler) {
+
+          //a status handler is available for this request so we need to register it!
+
+        }
 
         return self.sendRequest.call(self, req);
 
@@ -349,9 +357,19 @@ export default class {
 
                 if (Emitter.hasRequest((<WebSocketResponseBody>parsed).id)) {
                   let req = Emitter.getRequest((<WebSocketResponseBody>parsed).id);
-                  if ((<WebSocketResponseBody>parsed).statusCode > WebSocketMessageStatus.RPCStatusOK) {
+                  if ((<WebSocketResponseBody>parsed).messageType === WebSocketMessageType.RPCStatusMessage) {
+
+                    //handle the response directly if a handler is registered... we will report it back as required...
+                    if (req.hasStatusHandler) {
+                      req.processStatusMessage((<WebSocketResponseBody>parsed))
+                    } else {
+                      //dump the status message as needed...
+                    }
+
+                  } else if ((<WebSocketResponseBody>parsed).statusCode > WebSocketMessageStatus.RPCStatusOK) {
                     if ((<WebSocketResponseBody>parsed).statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
                       //try again!
+                      //we will attempt a reauth now...
                       window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
                     }
                     (<WebSocketRequest>req).reject(<WebSocketResponseBody>parsed);
