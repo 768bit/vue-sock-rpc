@@ -359,6 +359,7 @@ export default class {
                     }
 
                   } else if ((<WebSocketResponseBody>parsed).statusCode > WebSocketMessageStatus.RPCStatusOK) {
+                    Emitter.removeRequest((<WebSocketResponseBody>parsed).id);
                     if ((<WebSocketResponseBody>parsed).statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
                       //try again!
                       //we will attempt a reauth now...
@@ -366,6 +367,7 @@ export default class {
                     }
                     (<WebSocketRequest>req).reject(<WebSocketResponseBody>parsed);
                   } else {
+                    Emitter.removeRequest((<WebSocketResponseBody>parsed).id);
                     console.log("Resolving Response");
                     (<WebSocketRequest>req).resolve(<WebSocketResponseBody>parsed);
                   }

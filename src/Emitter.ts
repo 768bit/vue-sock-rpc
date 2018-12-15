@@ -32,19 +32,23 @@ class Emitter {
 
   }
 
-  getRequest(reqID: string): WebSocketRequest | undefined
-  getRequest(reqID: string, keepRequestInStack: boolean = false): WebSocketRequest | undefined {
+  getRequest(reqID: string): WebSocketRequest | undefined {
 
     if (this.requestStack.has(reqID)) {
 
       let req = this.requestStack.get(reqID);
-      if (!keepRequestInStack) {
-        this.requestStack.delete(reqID);
-      }
       return req;
 
     }
     return undefined;
+
+  }
+
+  removeRequest(reqID: string) {
+
+    if (this.requestStack.has(reqID)) {
+        this.requestStack.delete(reqID);
+    }
 
   }
 

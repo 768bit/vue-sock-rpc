@@ -20,16 +20,17 @@ var Emitter = /** @class */ (function () {
     Emitter.prototype.hasRequest = function (reqID) {
         return this.requestStack.has(reqID);
     };
-    Emitter.prototype.getRequest = function (reqID, keepRequestInStack) {
-        if (keepRequestInStack === void 0) { keepRequestInStack = false; }
+    Emitter.prototype.getRequest = function (reqID) {
         if (this.requestStack.has(reqID)) {
             var req = this.requestStack.get(reqID);
-            if (!keepRequestInStack) {
-                this.requestStack.delete(reqID);
-            }
             return req;
         }
         return undefined;
+    };
+    Emitter.prototype.removeRequest = function (reqID) {
+        if (this.requestStack.has(reqID)) {
+            this.requestStack.delete(reqID);
+        }
     };
     Emitter.prototype.addListener = function (label, callback, vm) {
         if (typeof callback === 'function') {
@@ -723,6 +724,7 @@ var default_1$3 = /** @class */ (function () {
                                         }
                                     }
                                     else if (parsed.statusCode > WebSocketMessageStatus.RPCStatusOK) {
+                                        Emitter$1.removeRequest(parsed.id);
                                         if (parsed.statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
                                             //try again!
                                             //we will attempt a reauth now...
@@ -731,6 +733,7 @@ var default_1$3 = /** @class */ (function () {
                                         req.reject(parsed);
                                     }
                                     else {
+                                        Emitter$1.removeRequest(parsed.id);
                                         console.log("Resolving Response");
                                         req.resolve(parsed);
                                     }
