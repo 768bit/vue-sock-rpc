@@ -34,7 +34,7 @@ class WebSocketRequest {
     let req = new WebSocketRequest(WebSocketMessageType.RPCMessage);
     req.reqObject.cmd = operation;
     req.payload = payload;
-    if (options && Object.keys(options).length > 0) {
+    if (options) {
       if (options.RPCOptions) {
         req.reqObject.options = options.RPCOptions;
       }

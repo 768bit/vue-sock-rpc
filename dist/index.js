@@ -339,7 +339,7 @@ var WebSocketRequest = /** @class */ (function () {
         var req = new WebSocketRequest(WebSocketMessageType.RPCMessage);
         req.reqObject.cmd = operation;
         req.payload = payload;
-        if (options && Object.keys(options).length > 0) {
+        if (options) {
             if (options.RPCOptions) {
                 req.reqObject.options = options.RPCOptions;
             }
@@ -675,8 +675,6 @@ var default_1$3 = /** @class */ (function () {
             this.WebSocket.callRPC = function (cmd, payload, options) {
                 //create the request object so we can get an id...
                 var req = WebSocketRequest.RPC(cmd, payload, options);
-                //if the request haas a status handler we need to register that - this will also be passed to the server to let it know this client is "subscribed"....
-                if (req.hasStatusHandler) ;
                 return self.sendRequest.call(self, req);
             };
         }

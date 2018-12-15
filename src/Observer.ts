@@ -299,14 +299,6 @@ export default class {
 
         let req = WebSocketRequest.RPC(cmd, payload, options);
 
-        //if the request haas a status handler we need to register that - this will also be passed to the server to let it know this client is "subscribed"....
-
-        if (req.hasStatusHandler) {
-
-          //a status handler is available for this request so we need to register it!
-
-        }
-
         return self.sendRequest.call(self, req);
 
       };
