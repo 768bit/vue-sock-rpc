@@ -525,6 +525,10 @@ var default_1$3 = /** @class */ (function () {
     }
     default_1$$1.prototype.processQueue = function () {
         var _this = this;
+        if (!this.sessionReady) {
+            console.log("Skipping Queue Processing Until Session is Ready.");
+            return resolve();
+        }
         if (this.queueEnabled) {
             if (this.processingQueue) {
                 return resolve();
@@ -648,10 +652,16 @@ var default_1$3 = /** @class */ (function () {
         }
         else {
             Emitter$1.addRequest(req);
-            this.processQueue().then(function () {
-                console.log("Sending Request", req.id);
-                _this.WebSocket.send(req.makeMessage());
-            });
+            //if we are warned not to process queue then we just send the req...
+            if (dontQueue) {
+                this.WebSocket.send(req.makeMessage());
+            }
+            else {
+                this.processQueue().then(function () {
+                    console.log("Sending Request", req.id);
+                    _this.WebSocket.send(req.makeMessage());
+                });
+            }
         }
         return req.internalPromise;
     };
