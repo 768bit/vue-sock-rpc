@@ -67,6 +67,11 @@ export default class {
 
   private processQueue() {
 
+    if (!this.sessionReady) {
+      console.log("Skipping Queue Processing Until Session is Ready.");
+      return Promise.resolve();
+    }
+
     if (this.queueEnabled) {
 
       if (this.processingQueue) {
@@ -265,13 +270,23 @@ export default class {
 
       Emitter.addRequest(req);
 
-      this.processQueue().then(() => {
+      //if we are warned not to process queue then we just send the req...
 
-        console.log("Sending Request", req.id);
+      if (dontQueue) {
 
         this.WebSocket.send(req.makeMessage());
 
-      });
+      } else {
+
+        this.processQueue().then(() => {
+
+          console.log("Sending Request", req.id);
+
+          this.WebSocket.send(req.makeMessage());
+
+        });
+
+      }
 
     }
 
