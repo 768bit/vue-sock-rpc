@@ -1,5 +1,9 @@
 import { WebSocketMessageType, WebSocketRequestBody, WebSocketResponseBody } from './types';
 import * as Promise from 'bluebird';
+declare type WebSocketRequestOptions = {
+    RPCOptions?: any;
+    StatusCallback: (req: WebSocketRequest, message: WebSocketResponseBody) => void;
+};
 declare class WebSocketRequest {
     messageType: WebSocketMessageType;
     id: string;
@@ -11,13 +15,13 @@ declare class WebSocketRequest {
     wasError: boolean;
     complete: boolean;
     queueable: boolean;
+    hasStatusHandler: boolean;
+    statusHandler: (req: WebSocketRequest, msg: WebSocketResponseBody) => void;
     private reqObject;
     private resolver;
     private rejecter;
     static RPC(operation: string, payload: any): WebSocketRequest;
-    static RPC(operation: string, payload: any, moduleURI: string): WebSocketRequest;
-    static RPC(operation: string, payload: any, moduleURI: string, options?: Map<string, any>): WebSocketRequest;
-    static RPC(operation: string, payload: any, moduleURI: string, options: Map<string, any>): WebSocketRequest;
+    static RPC(operation: string, payload: any, options: WebSocketRequestOptions): WebSocketRequest;
     static HttpGET(path: string): WebSocketRequest;
     static HttpPOST(path: string, payload: any): WebSocketRequest;
     static HttpPUT(path: string, payload: any): WebSocketRequest;
@@ -28,6 +32,7 @@ declare class WebSocketRequest {
     makeRequestObject(): WebSocketRequestBody;
     makeMessage(): string;
     setSeshKey(seshKey: string): this;
+    processStatusMessage(message: WebSocketResponseBody): void;
     resolve(response: WebSocketResponseBody): void;
     reject(response: WebSocketResponseBody): void;
     cancel(): void;

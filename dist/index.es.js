@@ -170,6 +170,7 @@ var WebSocketMessageType;
     WebSocketMessageType[WebSocketMessageType["RPCSessionStartMessage"] = 1] = "RPCSessionStartMessage";
     WebSocketMessageType[WebSocketMessageType["RPCSessionEndMessage"] = 4] = "RPCSessionEndMessage";
     WebSocketMessageType[WebSocketMessageType["RPCMessage"] = 32] = "RPCMessage";
+    WebSocketMessageType[WebSocketMessageType["RPCStatusMessage"] = 34] = "RPCStatusMessage";
     WebSocketMessageType[WebSocketMessageType["HTTPMessage"] = 64] = "HTTPMessage";
     WebSocketMessageType[WebSocketMessageType["ByteSessionStartMessage"] = 176] = "ByteSessionStartMessage";
     WebSocketMessageType[WebSocketMessageType["ByteSessionEndMessage"] = 180] = "ByteSessionEndMessage";
@@ -183,6 +184,8 @@ function WebSocketMessageTypeToString(messageType) {
             return "ServerHello";
         case WebSocketMessageType.RPCMessage:
             return "RPC";
+        case WebSocketMessageType.RPCStatusMessage:
+            return "RPCStatus";
         case WebSocketMessageType.BasicMessage:
             return "Basic";
         case WebSocketMessageType.HTTPMessage:
@@ -316,6 +319,7 @@ var WebSocketRequest = /** @class */ (function () {
         this.wasError = false;
         this.complete = false;
         this.queueable = true;
+        this.hasStatusHandler = false;
         var self = this;
         this.messageType = messageType;
         this.internalPromise = new Promise$1(function (resolve$$1, reject$$1) {
@@ -328,15 +332,18 @@ var WebSocketRequest = /** @class */ (function () {
             id: this.id
         };
     }
-    WebSocketRequest.RPC = function (operation, payload, moduleURI, options) {
+    WebSocketRequest.RPC = function (operation, payload, options) {
         var req = new WebSocketRequest(WebSocketMessageType.RPCMessage);
         req.reqObject.cmd = operation;
         req.payload = payload;
-        if (moduleURI && moduleURI !== "") {
-            req.reqObject.moduleURI = moduleURI;
-        }
-        if (options && options instanceof Map && options.size > 0) {
-            req.reqObject.options = options;
+        if (options && Object.keys(options).length > 0) {
+            if (options.RPCOptions) {
+                req.reqObject.options = options.RPCOptions;
+            }
+            if (options.StatusCallback && typeof options.StatusCallback === "function") {
+                req.hasStatusHandler = true;
+                req.statusHandler = options.StatusCallback;
+            }
         }
         return req;
     };
@@ -407,6 +414,11 @@ var WebSocketRequest = /** @class */ (function () {
     WebSocketRequest.prototype.setSeshKey = function (seshKey) {
         this.seshKey = seshKey;
         return this;
+    };
+    WebSocketRequest.prototype.processStatusMessage = function (message) {
+        if (this.hasStatusHandler) {
+            this.statusHandler(this, message);
+        }
     };
     WebSocketRequest.prototype.resolve = function (response) {
         if (response.messageType === WebSocketMessageType.RPCSessionStartErrorMessage || response.messageType === WebSocketMessageType.RPCSessionEndErrorMessage) {
@@ -655,13 +667,13 @@ var default_1$3 = /** @class */ (function () {
                 self.sendMessage(JSON.stringify(obj));
             };
         }
-        if (!('sendRPC' in this.WebSocket)) {
+        if (!('callRPC' in this.WebSocket)) {
             // @ts-ignore
-            this.WebSocket.sendRPC = function (cmd, payload, moduleURI, options) {
+            this.WebSocket.callRPC = function (cmd, payload, options) {
                 //create the request object so we can get an id...
-                if (moduleURI === void 0) { moduleURI = ""; }
-                if (options === void 0) { options = new Map(); }
-                var req = WebSocketRequest.RPC(cmd, payload, moduleURI, options);
+                var req = WebSocketRequest.RPC(cmd, payload, options);
+                //if the request haas a status handler we need to register that - this will also be passed to the server to let it know this client is "subscribed"....
+                if (req.hasStatusHandler) ;
                 return self.sendRequest.call(self, req);
             };
         }
@@ -706,9 +718,16 @@ var default_1$3 = /** @class */ (function () {
                                 typeof parsed.id === "string" && parsed.id !== "") {
                                 if (Emitter$1.hasRequest(parsed.id)) {
                                     var req = Emitter$1.getRequest(parsed.id);
-                                    if (parsed.statusCode > WebSocketMessageStatus.RPCStatusOK) {
+                                    if (parsed.messageType === WebSocketMessageType.RPCStatusMessage) {
+                                        //handle the response directly if a handler is registered... we will report it back as required...
+                                        if (req.hasStatusHandler) {
+                                            req.processStatusMessage(parsed);
+                                        }
+                                    }
+                                    else if (parsed.statusCode > WebSocketMessageStatus.RPCStatusOK) {
                                         if (parsed.statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
                                             //try again!
+                                            //we will attempt a reauth now...
                                             window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
                                         }
                                         req.reject(parsed);
