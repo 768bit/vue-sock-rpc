@@ -561,6 +561,8 @@ var default_1$3 = /** @class */ (function () {
                 }).finally(function () {
                     console.log("Completed Processing WebSocket Queue");
                     _this.processingQueue = false;
+                    //if there is anything still in the queue we need to process it so only once a "next tick" style que process will be done...
+                    return _this.processQueue();
                 }).thenReturn();
             }
         }

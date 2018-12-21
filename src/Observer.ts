@@ -125,8 +125,11 @@ export default class {
         }).finally(() => {
 
           console.log("Completed Processing WebSocket Queue");
-
           this.processingQueue = false;
+
+          //if there is anything still in the queue we need to process it so only once a "next tick" style que process will be done...
+
+          return this.processQueue();
 
         }).thenReturn();
 
@@ -261,9 +264,7 @@ export default class {
       }
 
       Emitter.addRequest(req);
-
       console.log("Queueing Request", req.id);
-
       this.requestQueue.enqueue({reqID: req.id});
 
     } else {
@@ -281,13 +282,10 @@ export default class {
         this.processQueue().then(() => {
 
           console.log("Sending Request", req.id);
-
           this.WebSocket.send(req.makeMessage());
 
         });
-
       }
-
     }
 
     return req.internalPromise;
@@ -317,7 +315,6 @@ export default class {
         //create the request object so we can get an id...
 
         let req = WebSocketRequest.RPC(cmd, payload, options);
-
         return self.sendRequest.call(self, req);
 
       };
@@ -416,7 +413,6 @@ export default class {
           default:
             Emitter.emit(eventType, event);
             return;
-
 
         }
 
