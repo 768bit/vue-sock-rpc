@@ -17,6 +17,7 @@ class WebSocketRequest {
   operation: string;
   payload: any;
   seshKey: string;
+  topic: string;
   internalPromise: Promise<any>;
   wasCancelled: boolean = false;
   wasError: boolean = false;
@@ -95,6 +96,18 @@ class WebSocketRequest {
   public static Basic(payload: any): WebSocketRequest {
     let req = new WebSocketRequest(WebSocketMessageType.BasicMessage);
     req.payload = payload;
+    return req;
+  }
+
+  public static Subscribe(topic: string): WebSocketRequest {
+    let req = new WebSocketRequest(WebSocketMessageType.SubscribeMessage);
+    req.topic = topic;
+    return req;
+  }
+
+  public static UnSubscribe(topic: string): WebSocketRequest {
+    let req = new WebSocketRequest(WebSocketMessageType.UnSubscribeMessage);
+    req.topic = topic;
     return req;
   }
 

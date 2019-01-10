@@ -4,6 +4,9 @@ enum WebSocketMessageType {
   RPCSessionEndMessage = 0x04,
   RPCMessage = 0x20,
   RPCStatusMessage = 0x22,
+  SubscribeMessage = 0x30,
+  PublishMessage = 0x31,
+  UnSubscribeMessage = 0x32,
   HTTPMessage = 0x40,
   ByteSessionStartMessage = 0xB0,
   ByteSessionEndMessage = 0xB4,
@@ -21,6 +24,12 @@ function WebSocketMessageTypeToString(messageType: WebSocketMessageType): string
       return "RPC";
     case WebSocketMessageType.RPCStatusMessage:
       return "RPCStatus";
+    case WebSocketMessageType.SubscribeMessage:
+      return "Subscribe";
+    case WebSocketMessageType.PublishMessage:
+      return "Publish";
+    case WebSocketMessageType.UnSubscribeMessage:
+      return "UnSubscribe";
     case WebSocketMessageType.BasicMessage:
       return "Basic";
     case WebSocketMessageType.HTTPMessage:
@@ -75,6 +84,7 @@ declare type WebSocketRequestBody = {
   moduleURI?: string
   id: string
   seshKey?: string
+  topic?:   string
   headers?: any
   payload?: any
   options?: any
@@ -89,6 +99,7 @@ declare type WebSocketResponseBody = {
   moduleURI?: string
   id: string
   seshKey?: string
+  topic?:   string
   headers?: Map<string, string>
   payload: any
   options?: Map<string, any>

@@ -31,6 +31,7 @@ export default class {
   sessionReady: boolean = true;
   private seshKey: string;
   private requestQueue: Queue;
+  private subscriptions:Map<string,any[]>;
 
   constructor(connectionUrl: string, opts: any = {}) {
 
@@ -42,6 +43,7 @@ export default class {
     this.connectionUrl = connectionUrl;
     this.opts = opts;
     this.format = (opts.format ? opts.format.toLowerCase() : "json");
+    this.subscriptions = new Map<string, any[]>();
 
     this.reconnection = this.opts.reconnection || false;
     this.reconnectionAttempts = this.opts.reconnectionAttempts || Infinity;
@@ -320,6 +322,63 @@ export default class {
       };
 
     }
+    if (!('subscribe' in this.WebSocket)) {
+      // @ts-ignore
+      this.WebSocket.subscribe = function (topic: string, handler:any): Promise<any> {
+
+        if (typeof handler !== "function") {
+          return Promise.reject(new Error("Handler must be a function"))
+        }
+
+        if (self.subscriptions.has(topic)) {
+          let st = self.subscriptions.get(topic);
+          if (st.indexOf(handler) >= 0) {
+            return Promise.reject(new Error("Handler already registered for pub/sub for topic: " + topic));
+          } else {
+            st.push(handler);
+            return Promise.resolve();
+          }
+        } else {
+          let req = WebSocketRequest.Subscribe(topic);
+          return self.sendRequest.call(self, req).then(() => {
+
+            //subscribe and add topic to subscriptions...
+            self.subscriptions.set(topic, [handler]);
+
+          });
+        }
+
+      };
+    }
+    if (!('unsubscribe' in this.WebSocket)) {
+      // @ts-ignore
+      this.WebSocket.unsubscribe = function (topic: string, handler:any): Promise<any> {
+
+        if (!handler || typeof handler !== "function") {
+          if (self.subscriptions.has(topic)) {
+            let req = WebSocketRequest.UnSubscribe(topic);
+            return self.sendRequest.call(self, req).then(() => {
+
+            });
+          } else {
+            return Promise.reject(new Error("Supplied topic is not registered for pub/sub: " + topic))
+          }
+        }
+        if (self.subscriptions.has(topic)) {
+          let st = self.subscriptions.get(topic);
+          let ind = st.indexOf(handler);
+          if (ind >= 0) {
+            self.subscriptions.set(topic, st.splice(ind, 1));
+            return Promise.resolve();
+          } else {
+            return Promise.reject(new Error("Supplied Handler is not registered for pub/sub for topic: " + topic))
+          }
+        } else {
+          return Promise.reject(new Error("Supplied topic is not registered for pub/sub: " + topic))
+        }
+
+      };
+    }
 
     return this.WebSocket;
   }
@@ -345,6 +404,7 @@ export default class {
   }
 
   onEvent() {
+    let self = this;
     ['onmessage', 'onclose', 'onerror', 'onopen'].forEach((eventType) => {
       (<any>this.WebSocket)[eventType] = (event: any) => {
 
@@ -382,6 +442,16 @@ export default class {
                       window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
                     }
                     (<WebSocketRequest>req).reject(<WebSocketResponseBody>parsed);
+                  } else if ((<WebSocketResponseBody>parsed).messageType === WebSocketMessageType.PublishMessage) {
+                    //item is a publish message... iterate the handlers for topic and send data...
+                    if (self.subscriptions.has((<WebSocketResponseBody>parsed).topic)) {
+                      let st = self.subscriptions.get((<WebSocketResponseBody>parsed).topic);
+                      if (st && Array.isArray(st) && st.length > 0) {
+                        st.forEach((handler) => {
+                          handler((<WebSocketResponseBody>parsed).topic, (<WebSocketResponseBody>parsed).payload.publish)
+                        })
+                      }
+                    }
                   } else {
                     Emitter.removeRequest((<WebSocketResponseBody>parsed).id);
                     console.log("Resolving Response");
