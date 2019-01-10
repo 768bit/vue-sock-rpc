@@ -4,6 +4,9 @@ declare enum WebSocketMessageType {
     RPCSessionEndMessage = 4,
     RPCMessage = 32,
     RPCStatusMessage = 34,
+    SubscribeMessage = 48,
+    PublishMessage = 49,
+    UnSubscribeMessage = 50,
     HTTPMessage = 64,
     ByteSessionStartMessage = 176,
     ByteSessionEndMessage = 180,
@@ -28,6 +31,7 @@ declare type WebSocketRequestBody = {
     moduleURI?: string;
     id: string;
     seshKey?: string;
+    topic?: string;
     headers?: any;
     payload?: any;
     options?: any;
@@ -40,6 +44,7 @@ declare type WebSocketResponseBody = {
     moduleURI?: string;
     id: string;
     seshKey?: string;
+    topic?: string;
     headers?: Map<string, string>;
     payload: any;
     options?: Map<string, any>;

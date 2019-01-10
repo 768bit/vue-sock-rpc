@@ -23,6 +23,7 @@ export default class {
     sessionReady: boolean;
     private seshKey;
     private requestQueue;
+    private subscriptions;
     constructor(connectionUrl: string, opts?: any);
     private processQueue;
     startSession(): Promise<any>;

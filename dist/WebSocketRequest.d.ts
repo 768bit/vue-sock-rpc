@@ -10,6 +10,7 @@ declare class WebSocketRequest {
     operation: string;
     payload: any;
     seshKey: string;
+    topic: string;
     internalPromise: Promise<any>;
     wasCancelled: boolean;
     wasError: boolean;
@@ -27,6 +28,8 @@ declare class WebSocketRequest {
     static HttpPUT(path: string, payload: any): WebSocketRequest;
     static HttpDELETE(path: string): WebSocketRequest;
     static Basic(payload: any): WebSocketRequest;
+    static Subscribe(topic: string): WebSocketRequest;
+    static UnSubscribe(topic: string): WebSocketRequest;
     static StartSession(userID: string, jwtTicketID: string): WebSocketRequest;
     constructor(messageType: WebSocketMessageType);
     makeRequestObject(): WebSocketRequestBody;

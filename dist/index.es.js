@@ -172,6 +172,9 @@ var WebSocketMessageType;
     WebSocketMessageType[WebSocketMessageType["RPCSessionEndMessage"] = 4] = "RPCSessionEndMessage";
     WebSocketMessageType[WebSocketMessageType["RPCMessage"] = 32] = "RPCMessage";
     WebSocketMessageType[WebSocketMessageType["RPCStatusMessage"] = 34] = "RPCStatusMessage";
+    WebSocketMessageType[WebSocketMessageType["SubscribeMessage"] = 48] = "SubscribeMessage";
+    WebSocketMessageType[WebSocketMessageType["PublishMessage"] = 49] = "PublishMessage";
+    WebSocketMessageType[WebSocketMessageType["UnSubscribeMessage"] = 50] = "UnSubscribeMessage";
     WebSocketMessageType[WebSocketMessageType["HTTPMessage"] = 64] = "HTTPMessage";
     WebSocketMessageType[WebSocketMessageType["ByteSessionStartMessage"] = 176] = "ByteSessionStartMessage";
     WebSocketMessageType[WebSocketMessageType["ByteSessionEndMessage"] = 180] = "ByteSessionEndMessage";
@@ -187,6 +190,12 @@ function WebSocketMessageTypeToString(messageType) {
             return "RPC";
         case WebSocketMessageType.RPCStatusMessage:
             return "RPCStatus";
+        case WebSocketMessageType.SubscribeMessage:
+            return "Subscribe";
+        case WebSocketMessageType.PublishMessage:
+            return "Publish";
+        case WebSocketMessageType.UnSubscribeMessage:
+            return "UnSubscribe";
         case WebSocketMessageType.BasicMessage:
             return "Basic";
         case WebSocketMessageType.HTTPMessage:
@@ -391,6 +400,16 @@ var WebSocketRequest = /** @class */ (function () {
         req.payload = payload;
         return req;
     };
+    WebSocketRequest.Subscribe = function (topic) {
+        var req = new WebSocketRequest(WebSocketMessageType.SubscribeMessage);
+        req.topic = topic;
+        return req;
+    };
+    WebSocketRequest.UnSubscribe = function (topic) {
+        var req = new WebSocketRequest(WebSocketMessageType.UnSubscribeMessage);
+        req.topic = topic;
+        return req;
+    };
     WebSocketRequest.StartSession = function (userID, jwtTicketID) {
         var req = new WebSocketRequest(WebSocketMessageType.RPCSessionStartMessage);
         req.queueable = false;
@@ -506,6 +525,7 @@ var default_1$3 = /** @class */ (function () {
         this.connectionUrl = connectionUrl;
         this.opts = opts;
         this.format = (opts.format ? opts.format.toLowerCase() : "json");
+        this.subscriptions = new Map();
         this.reconnection = this.opts.reconnection || false;
         this.reconnectionAttempts = this.opts.reconnectionAttempts || Infinity;
         this.reconnectionDelay = this.opts.reconnectionDelay || 1000;
@@ -692,6 +712,60 @@ var default_1$3 = /** @class */ (function () {
                 return self.sendRequest.call(self, req);
             };
         }
+        if (!('subscribe' in this.WebSocket)) {
+            // @ts-ignore
+            this.WebSocket.subscribe = function (topic, handler) {
+                if (typeof handler !== "function") {
+                    return reject(new Error("Handler must be a function"));
+                }
+                if (self.subscriptions.has(topic)) {
+                    var st = self.subscriptions.get(topic);
+                    if (st.indexOf(handler) >= 0) {
+                        return reject(new Error("Handler already registered for pub/sub for topic: " + topic));
+                    }
+                    else {
+                        st.push(handler);
+                        return resolve();
+                    }
+                }
+                else {
+                    var req = WebSocketRequest.Subscribe(topic);
+                    return self.sendRequest.call(self, req).then(function () {
+                        //subscribe and add topic to subscriptions...
+                        self.subscriptions.set(topic, [handler]);
+                    });
+                }
+            };
+        }
+        if (!('unsubscribe' in this.WebSocket)) {
+            // @ts-ignore
+            this.WebSocket.unsubscribe = function (topic, handler) {
+                if (!handler || typeof handler !== "function") {
+                    if (self.subscriptions.has(topic)) {
+                        var req = WebSocketRequest.UnSubscribe(topic);
+                        return self.sendRequest.call(self, req).then(function () {
+                        });
+                    }
+                    else {
+                        return reject(new Error("Supplied topic is not registered for pub/sub: " + topic));
+                    }
+                }
+                if (self.subscriptions.has(topic)) {
+                    var st = self.subscriptions.get(topic);
+                    var ind = st.indexOf(handler);
+                    if (ind >= 0) {
+                        self.subscriptions.set(topic, st.splice(ind, 1));
+                        return resolve();
+                    }
+                    else {
+                        return reject(new Error("Supplied Handler is not registered for pub/sub for topic: " + topic));
+                    }
+                }
+                else {
+                    return reject(new Error("Supplied topic is not registered for pub/sub: " + topic));
+                }
+            };
+        }
         return this.WebSocket;
     };
     default_1$$1.prototype.reconnect = function () {
@@ -715,43 +789,55 @@ var default_1$3 = /** @class */ (function () {
     };
     default_1$$1.prototype.onEvent = function () {
         var _this = this;
+        var self = this;
         ['onmessage', 'onclose', 'onerror', 'onopen'].forEach(function (eventType) {
             _this.WebSocket[eventType] = function (event) {
                 switch (eventType) {
                     case "onmessage":
                         //attempt to parse the message...
                         try {
-                            var parsed = event;
-                            if (typeof parsed === "string") {
-                                parsed = JSON.parse(parsed);
+                            var parsed_1 = event;
+                            if (typeof parsed_1 === "string") {
+                                parsed_1 = JSON.parse(parsed_1);
                             }
-                            else if (parsed && parsed.data && typeof parsed.data === "string") {
-                                parsed = JSON.parse(parsed.data);
+                            else if (parsed_1 && parsed_1.data && typeof parsed_1.data === "string") {
+                                parsed_1 = JSON.parse(parsed_1.data);
                             }
-                            console.log("Got message", parsed);
-                            if (parsed && parsed.hasOwnProperty("messageType") && parsed.hasOwnProperty("id") &&
-                                typeof parsed.id === "string" && parsed.id !== "") {
-                                if (Emitter$1.hasRequest(parsed.id)) {
-                                    var req = Emitter$1.getRequest(parsed.id);
-                                    if (parsed.messageType === WebSocketMessageType.RPCStatusMessage) {
+                            console.log("Got message", parsed_1);
+                            if (parsed_1 && parsed_1.hasOwnProperty("messageType") && parsed_1.hasOwnProperty("id") &&
+                                typeof parsed_1.id === "string" && parsed_1.id !== "") {
+                                if (Emitter$1.hasRequest(parsed_1.id)) {
+                                    var req = Emitter$1.getRequest(parsed_1.id);
+                                    if (parsed_1.messageType === WebSocketMessageType.RPCStatusMessage) {
                                         //handle the response directly if a handler is registered... we will report it back as required...
                                         if (req.hasStatusHandler) {
-                                            req.processStatusMessage(parsed);
+                                            req.processStatusMessage(parsed_1);
                                         }
                                     }
-                                    else if (parsed.statusCode > WebSocketMessageStatus.RPCStatusOK) {
-                                        Emitter$1.removeRequest(parsed.id);
-                                        if (parsed.statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
+                                    else if (parsed_1.statusCode > WebSocketMessageStatus.RPCStatusOK) {
+                                        Emitter$1.removeRequest(parsed_1.id);
+                                        if (parsed_1.statusCode === WebSocketMessageStatus.RPCStatusUnauthorised) {
                                             //try again!
                                             //we will attempt a reauth now...
                                             window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
                                         }
-                                        req.reject(parsed);
+                                        req.reject(parsed_1);
+                                    }
+                                    else if (parsed_1.messageType === WebSocketMessageType.PublishMessage) {
+                                        //item is a publish message... iterate the handlers for topic and send data...
+                                        if (self.subscriptions.has(parsed_1.topic)) {
+                                            var st = self.subscriptions.get(parsed_1.topic);
+                                            if (st && Array.isArray(st) && st.length > 0) {
+                                                st.forEach(function (handler) {
+                                                    handler(parsed_1.topic, parsed_1.payload.publish);
+                                                });
+                                            }
+                                        }
                                     }
                                     else {
-                                        Emitter$1.removeRequest(parsed.id);
+                                        Emitter$1.removeRequest(parsed_1.id);
                                         console.log("Resolving Response");
-                                        req.resolve(parsed);
+                                        req.resolve(parsed_1);
                                     }
                                 }
                                 return;
@@ -762,7 +848,7 @@ var default_1$3 = /** @class */ (function () {
                             }
                             else {
                                 Emitter$1.emit("onmessage", event);
-                                Emitter$1.emit("onobject", parsed);
+                                Emitter$1.emit("onobject", parsed_1);
                             }
                         }
                         catch (ex) {
