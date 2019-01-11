@@ -464,8 +464,8 @@ export default class {
                   if (self.subscriptions.has((<WebSocketResponseBody>parsed).topic)) {
                     let st = self.subscriptions.get((<WebSocketResponseBody>parsed).topic);
                     if (st && Array.isArray(st) && st.length > 0) {
-                      st.forEach((handler) => {
-                        handler((<WebSocketResponseBody>parsed).topic, (<WebSocketResponseBody>parsed).payload.publish)
+                      st.forEach((reg:{ handler:any }) => {
+                        reg.handler((<WebSocketResponseBody>parsed).topic, (<WebSocketResponseBody>parsed).payload.publish)
                       })
                     }
                   }
