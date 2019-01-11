@@ -332,7 +332,25 @@ export default class {
 
         if (self.subscriptions.has(topic)) {
           let st = self.subscriptions.get(topic);
-          if (st.indexOf(handler) >= 0) {
+          if (!st || !Array.isArray(st)) {
+            self.subscriptions.set(topic, []);
+          }
+          if (st.length === 0) {
+            let req = WebSocketRequest.Subscribe(topic);
+            return self.sendRequest.call(self, req).then(() => {
+
+              //subscribe and add topic to subscriptions...
+              self.subscriptions.set(topic, [{ handler : handler }]);
+
+            });
+          }
+          let ind = st.reduce((i: number, listener: { handler: any }, index: number) => {
+            if (typeof listener.handler === 'function' && listener.handler === handler) {
+              i = index;
+            }
+            return i;
+          }, -1);
+          if (ind >= 0) {
             return Promise.reject(new Error("Handler already registered for pub/sub for topic: " + topic));
           } else {
             st.push({ handler : handler });
@@ -374,8 +392,9 @@ export default class {
           }, -1);
           //let ind = st.indexOf({ handler : handler });
           if (ind >= 0) {
-            console.log("Removing item at index", ind);
-            self.subscriptions.set(topic, st.splice(ind, 1));
+            //console.log("Removing item at index", ind, st);
+            st.splice(ind, 1);
+            //self.subscriptions.set(topic, );
             if (self.subscriptions.get(topic).length === 0) {
               // @ts-ignore
               return self.WebSocket.unsubscribe(topic);
