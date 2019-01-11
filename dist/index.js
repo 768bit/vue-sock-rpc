@@ -810,9 +810,9 @@ var default_1$3 = /** @class */ (function () {
                                 parsed_1 = JSON.parse(parsed_1.data);
                             }
                             console.log("Got message", parsed_1);
-                            if (parsed_1 && parsed_1.hasOwnProperty("messageType") && parsed_1.hasOwnProperty("id") &&
-                                typeof parsed_1.id === "string" && parsed_1.id !== "") {
-                                if (Emitter$1.hasRequest(parsed_1.id)) {
+                            if (parsed_1 && parsed_1.hasOwnProperty("messageType")) {
+                                if (parsed_1.hasOwnProperty("id") && typeof parsed_1.id === "string" && parsed_1.id !== "" &&
+                                    Emitter$1.hasRequest(parsed_1.id)) {
                                     var req = Emitter$1.getRequest(parsed_1.id);
                                     if (parsed_1.messageType === WebSocketMessageType.RPCStatusMessage) {
                                         //handle the response directly if a handler is registered... we will report it back as required...
@@ -829,21 +829,22 @@ var default_1$3 = /** @class */ (function () {
                                         }
                                         req.reject(parsed_1);
                                     }
-                                    else if (parsed_1.messageType === WebSocketMessageType.PublishMessage) {
-                                        //item is a publish message... iterate the handlers for topic and send data...
-                                        if (self.subscriptions.has(parsed_1.topic)) {
-                                            var st = self.subscriptions.get(parsed_1.topic);
-                                            if (st && Array.isArray(st) && st.length > 0) {
-                                                st.forEach(function (handler) {
-                                                    handler(parsed_1.topic, parsed_1.payload.publish);
-                                                });
-                                            }
-                                        }
-                                    }
                                     else {
                                         Emitter$1.removeRequest(parsed_1.id);
                                         console.log("Resolving Response");
                                         req.resolve(parsed_1);
+                                    }
+                                }
+                                else if (parsed_1.messageType === WebSocketMessageType.PublishMessage &&
+                                    typeof parsed_1.topic === "string" && parsed_1.topic !== "") {
+                                    //item is a publish message... iterate the handlers for topic and send data...
+                                    if (self.subscriptions.has(parsed_1.topic)) {
+                                        var st = self.subscriptions.get(parsed_1.topic);
+                                        if (st && Array.isArray(st) && st.length > 0) {
+                                            st.forEach(function (handler) {
+                                                handler(parsed_1.topic, parsed_1.payload.publish);
+                                            });
+                                        }
                                     }
                                 }
                                 return;

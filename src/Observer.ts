@@ -420,10 +420,11 @@ export default class {
                 parsed = JSON.parse((<any>parsed).data);
               }
               console.log("Got message", parsed);
-              if (parsed && parsed.hasOwnProperty("messageType") && parsed.hasOwnProperty("id") &&
-                typeof (<WebSocketResponseBody>parsed).id === "string" && (<WebSocketResponseBody>parsed).id !== "") {
+              if (parsed && parsed.hasOwnProperty("messageType")) {
 
-                if (Emitter.hasRequest((<WebSocketResponseBody>parsed).id)) {
+                if (parsed.hasOwnProperty("id") && typeof (<WebSocketResponseBody>parsed).id === "string" && (<WebSocketResponseBody>parsed).id !== "" &&
+                  Emitter.hasRequest((<WebSocketResponseBody>parsed).id)) {
+
                   let req = Emitter.getRequest((<WebSocketResponseBody>parsed).id);
                   if ((<WebSocketResponseBody>parsed).messageType === WebSocketMessageType.RPCStatusMessage) {
 
@@ -442,20 +443,22 @@ export default class {
                       window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
                     }
                     (<WebSocketRequest>req).reject(<WebSocketResponseBody>parsed);
-                  } else if ((<WebSocketResponseBody>parsed).messageType === WebSocketMessageType.PublishMessage) {
-                    //item is a publish message... iterate the handlers for topic and send data...
-                    if (self.subscriptions.has((<WebSocketResponseBody>parsed).topic)) {
-                      let st = self.subscriptions.get((<WebSocketResponseBody>parsed).topic);
-                      if (st && Array.isArray(st) && st.length > 0) {
-                        st.forEach((handler) => {
-                          handler((<WebSocketResponseBody>parsed).topic, (<WebSocketResponseBody>parsed).payload.publish)
-                        })
-                      }
-                    }
-                  } else {
+                  }  else {
                     Emitter.removeRequest((<WebSocketResponseBody>parsed).id);
                     console.log("Resolving Response");
                     (<WebSocketRequest>req).resolve(<WebSocketResponseBody>parsed);
+                  }
+                } else if ((<WebSocketResponseBody>parsed).messageType === WebSocketMessageType.PublishMessage &&
+                  typeof (<WebSocketResponseBody>parsed).topic === "string" && (<WebSocketResponseBody>parsed).topic !== "") {
+
+                  //item is a publish message... iterate the handlers for topic and send data...
+                  if (self.subscriptions.has((<WebSocketResponseBody>parsed).topic)) {
+                    let st = self.subscriptions.get((<WebSocketResponseBody>parsed).topic);
+                    if (st && Array.isArray(st) && st.length > 0) {
+                      st.forEach((handler) => {
+                        handler((<WebSocketResponseBody>parsed).topic, (<WebSocketResponseBody>parsed).payload.publish)
+                      })
+                    }
                   }
                 }
                 return;
