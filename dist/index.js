@@ -429,6 +429,9 @@ var WebSocketRequest = /** @class */ (function () {
         if (this.payload) {
             this.reqObject.payload = this.payload;
         }
+        if (this.topic && this.topic !== "") {
+            this.reqObject.topic = this.topic;
+        }
         return this.reqObject;
     };
     WebSocketRequest.prototype.makeMessage = function () {

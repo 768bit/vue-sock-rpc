@@ -153,6 +153,10 @@ class WebSocketRequest {
       this.reqObject.payload = this.payload;
     }
 
+    if (this.topic && this.topic !== "") {
+      this.reqObject.topic = this.topic;
+    }
+
     return this.reqObject;
 
   }
