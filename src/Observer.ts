@@ -1,7 +1,7 @@
 import Emitter from './Emitter'
 import * as Promise from 'bluebird';
 import HttpClient from './HttpClient';
-import WebSocketRequest from './WebSocketRequest';
+import { WebSocketRequest, WebSocketRequestOptions } from './WebSocketRequest';
 import {WebSocketMessageStatus, WebSocketMessageType, WebSocketResponseBody} from "./types";
 import Queue from './Queue';
 

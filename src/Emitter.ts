@@ -1,4 +1,4 @@
-import WebSocketRequest from "./WebSocketRequest";
+import { WebSocketRequest } from "./WebSocketRequest";
 
 class Emitter {
   listeners: Map<string | number | symbol, any>;

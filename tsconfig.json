@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "./dist",
+    //"declarationDir": "./dist",
     "moduleResolution": "node",
     "module": "es6",
     "lib": [

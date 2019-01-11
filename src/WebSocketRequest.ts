@@ -220,4 +220,4 @@ class WebSocketRequest {
 }
 
 
-export default WebSocketRequest
+export { WebSocketRequest, WebSocketRequestOptions }

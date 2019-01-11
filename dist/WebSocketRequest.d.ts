@@ -40,4 +40,4 @@ declare class WebSocketRequest {
     reject(response: WebSocketResponseBody): void;
     cancel(): void;
 }
-export default WebSocketRequest;
+export { WebSocketRequest, WebSocketRequestOptions };
