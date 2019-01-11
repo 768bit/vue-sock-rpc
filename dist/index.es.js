@@ -847,8 +847,8 @@ var default_1$3 = /** @class */ (function () {
                                     if (self.subscriptions.has(parsed_1.topic)) {
                                         var st = self.subscriptions.get(parsed_1.topic);
                                         if (st && Array.isArray(st) && st.length > 0) {
-                                            st.forEach(function (handler) {
-                                                handler(parsed_1.topic, parsed_1.payload.publish);
+                                            st.forEach(function (reg) {
+                                                reg.handler(parsed_1.topic, parsed_1.payload.publish);
                                             });
                                         }
                                     }
