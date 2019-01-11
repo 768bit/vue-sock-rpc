@@ -1,3 +1,6 @@
+declare interface RPCPayload {
+    [key: string]: any;
+}
 declare enum WebSocketMessageType {
     ServerHelloMessage = 0,
     RPCSessionStartMessage = 1,
@@ -51,4 +54,4 @@ declare type WebSocketResponseBody = {
     statusCode: WebSocketMessageStatus;
     errors?: Error[] | string[];
 };
-export { WebSocketMessageType, WebSocketMessageStatus, WebSocketRequestBody, WebSocketResponseBody, WebSocketMessageTypeToString, WebSocketMessageStatusToString };
+export { WebSocketMessageType, WebSocketMessageStatus, WebSocketRequestBody, WebSocketResponseBody, WebSocketMessageTypeToString, WebSocketMessageStatusToString, RPCPayload };

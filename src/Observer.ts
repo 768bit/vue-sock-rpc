@@ -2,9 +2,8 @@ import Emitter from './Emitter'
 import * as Promise from 'bluebird';
 import HttpClient from './HttpClient';
 import { WebSocketRequest, WebSocketRequestOptions } from './WebSocketRequest';
-import {WebSocketMessageStatus, WebSocketMessageType, WebSocketResponseBody} from "./inttypes";
+import {RPCPayload, WebSocketMessageStatus, WebSocketMessageType, WebSocketResponseBody} from "./inttypes";
 import Queue from './Queue';
-import {RPCPayload} from "../dist/types";
 
 export enum WebSocketConnectionStatus {
   Disconnected = 0x0,

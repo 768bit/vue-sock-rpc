@@ -1,3 +1,7 @@
+declare interface RPCPayload {
+  [key:string]:any;
+}
+
 enum WebSocketMessageType {
   ServerHelloMessage = 0x00,
   RPCSessionStartMessage = 0x01,
@@ -114,5 +118,6 @@ export {
   WebSocketRequestBody,
   WebSocketResponseBody,
   WebSocketMessageTypeToString,
-  WebSocketMessageStatusToString
+  WebSocketMessageStatusToString,
+  RPCPayload
 };
