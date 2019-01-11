@@ -4,7 +4,7 @@ export { WebSocketMessageType, WebSocketMessageStatus, WebSocketRequestBody, Web
 declare interface RPCWebSocket extends WebSocket {
     sendMessage(msg: string): void;
     sendObj(obj: any): void;
-    callRPC(cmd: string, payload: string, options?: WebSocketRequestOptions): Promise<any>;
+    callRPC(cmd: string, payload: any, options?: WebSocketRequestOptions): Promise<any>;
     subscribe(topic: string, handler: any): Promise<any>;
     unsubscribe(topic: string, handler?: any): Promise<any>;
 }
