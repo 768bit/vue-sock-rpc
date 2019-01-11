@@ -366,12 +366,13 @@ export default class {
         }
         if (self.subscriptions.has(topic)) {
           let st = self.subscriptions.get(topic);
-          let ind = st.reduce((i: number, listener: { handler: any }, index: number) => {
-            if (typeof listener.handler === 'function' && listener.handler === handler) {
-              i = index;
-            }
-            return i;
-          }, -1);
+          // let ind = st.reduce((i: number, listener: { handler: any }, index: number) => {
+          //   if (typeof listener.handler === 'function' && listener.handler === handler) {
+          //     i = index;
+          //   }
+          //   return i;
+          // }, -1);
+          let ind = st.indexOf({ handler : handler });
           if (ind >= 0) {
             self.subscriptions.set(topic, st.splice(ind, 1));
             if (self.subscriptions.get(topic).length === 0) {

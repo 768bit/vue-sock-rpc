@@ -755,12 +755,13 @@ var default_1$3 = /** @class */ (function () {
                 }
                 if (self.subscriptions.has(topic)) {
                     var st = self.subscriptions.get(topic);
-                    var ind = st.reduce(function (i, listener, index) {
-                        if (typeof listener.handler === 'function' && listener.handler === handler) {
-                            i = index;
-                        }
-                        return i;
-                    }, -1);
+                    // let ind = st.reduce((i: number, listener: { handler: any }, index: number) => {
+                    //   if (typeof listener.handler === 'function' && listener.handler === handler) {
+                    //     i = index;
+                    //   }
+                    //   return i;
+                    // }, -1);
+                    var ind = st.indexOf({ handler: handler });
                     if (ind >= 0) {
                         self.subscriptions.set(topic, st.splice(ind, 1));
                         if (self.subscriptions.get(topic).length === 0) {
