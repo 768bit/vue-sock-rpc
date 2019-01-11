@@ -758,6 +758,10 @@ var default_1$3 = /** @class */ (function () {
                     var ind = st.indexOf(handler);
                     if (ind >= 0) {
                         self.subscriptions.set(topic, st.splice(ind, 1));
+                        if (self.subscriptions.get(topic).length === 0) {
+                            // @ts-ignore
+                            return self.WebSocket.unsubscribe(topic);
+                        }
                         return resolve();
                     }
                     else {

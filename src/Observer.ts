@@ -352,7 +352,7 @@ export default class {
     }
     if (!('unsubscribe' in this.WebSocket)) {
       // @ts-ignore
-      this.WebSocket.unsubscribe = function (topic: string, handler:any): Promise<any> {
+      this.WebSocket.unsubscribe = function (topic: string, handler?:any): Promise<any> {
 
         if (!handler || typeof handler !== "function") {
           if (self.subscriptions.has(topic)) {
@@ -369,6 +369,10 @@ export default class {
           let ind = st.indexOf(handler);
           if (ind >= 0) {
             self.subscriptions.set(topic, st.splice(ind, 1));
+            if (self.subscriptions.get(topic).length === 0) {
+              // @ts-ignore
+              return self.WebSocket.unsubscribe(topic);
+            }
             return Promise.resolve();
           } else {
             return Promise.reject(new Error("Supplied Handler is not registered for pub/sub for topic: " + topic))
