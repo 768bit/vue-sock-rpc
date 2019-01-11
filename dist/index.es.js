@@ -710,6 +710,10 @@ var default_1$3 = /** @class */ (function () {
         if (!('callRPC' in this.WebSocket)) {
             // @ts-ignore
             this.WebSocket.callRPC = function (cmd, payload, options) {
+                if (!payload)
+                    payload = {};
+                if (!options)
+                    options = {};
                 //create the request object so we can get an id...
                 var req = WebSocketRequest.RPC(cmd, payload, options);
                 return self.sendRequest.call(self, req);

@@ -2,7 +2,7 @@ import { WebSocketMessageType, WebSocketRequestBody, WebSocketResponseBody } fro
 import * as Promise from 'bluebird';
 declare type WebSocketRequestOptions = {
     RPCOptions?: any;
-    StatusCallback: (req: WebSocketRequest, message: WebSocketResponseBody) => void;
+    StatusCallback?: (req: WebSocketRequest, message: WebSocketResponseBody) => void;
 };
 declare class WebSocketRequest {
     messageType: WebSocketMessageType;

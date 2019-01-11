@@ -4,6 +4,7 @@ import HttpClient from './HttpClient';
 import { WebSocketRequest, WebSocketRequestOptions } from './WebSocketRequest';
 import {WebSocketMessageStatus, WebSocketMessageType, WebSocketResponseBody} from "./inttypes";
 import Queue from './Queue';
+import {RPCPayload} from "../dist/types";
 
 export enum WebSocketConnectionStatus {
   Disconnected = 0x0,
@@ -312,7 +313,10 @@ export default class {
     }
     if (!('callRPC' in this.WebSocket)) {
       // @ts-ignore
-      this.WebSocket.callRPC = function (cmd: string, payload: string, options?:WebSocketRequestOptions): Promise<any> {
+      this.WebSocket.callRPC = function (cmd: string, payload?:RPCPayload|any, options?:WebSocketRequestOptions): Promise<any> {
+
+        if (!payload) payload = {};
+        if (!options) options = {};
 
         //create the request object so we can get an id...
 

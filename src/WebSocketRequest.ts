@@ -7,7 +7,7 @@ const UUID = new ShortUniqueId();
 
 declare type WebSocketRequestOptions = {
   RPCOptions?:any
-  StatusCallback: (req:WebSocketRequest, message:WebSocketResponseBody) => void
+  StatusCallback?: (req:WebSocketRequest, message:WebSocketResponseBody) => void
 }
 
 class WebSocketRequest {
