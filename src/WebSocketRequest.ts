@@ -1,4 +1,4 @@
-import {WebSocketMessageType, WebSocketRequestBody, WebSocketResponseBody} from './types';
+import {WebSocketMessageType, WebSocketRequestBody, WebSocketResponseBody} from './inttypes';
 import * as Promise from 'bluebird';
 import ShortUniqueId from 'short-unique-id';
 import WebSocketError from "./WebSocketError";

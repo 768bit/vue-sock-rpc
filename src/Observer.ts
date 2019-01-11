@@ -2,7 +2,7 @@ import Emitter from './Emitter'
 import * as Promise from 'bluebird';
 import HttpClient from './HttpClient';
 import { WebSocketRequest, WebSocketRequestOptions } from './WebSocketRequest';
-import {WebSocketMessageStatus, WebSocketMessageType, WebSocketResponseBody} from "./types";
+import {WebSocketMessageStatus, WebSocketMessageType, WebSocketResponseBody} from "./inttypes";
 import Queue from './Queue';
 
 export enum WebSocketConnectionStatus {

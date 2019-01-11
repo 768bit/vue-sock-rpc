@@ -1,4 +1,4 @@
-import { WebSocketMessageType, WebSocketRequestBody, WebSocketResponseBody } from './types';
+import { WebSocketMessageType, WebSocketRequestBody, WebSocketResponseBody } from './inttypes';
 import * as Promise from 'bluebird';
 declare type WebSocketRequestOptions = {
     RPCOptions?: any;

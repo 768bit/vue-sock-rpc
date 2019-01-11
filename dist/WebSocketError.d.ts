@@ -1,4 +1,4 @@
-import { WebSocketRequestBody, WebSocketResponseBody } from "./types";
+import { WebSocketRequestBody, WebSocketResponseBody } from "./inttypes";
 export default class extends Error {
     request: WebSocketRequestBody;
     response: WebSocketResponseBody;

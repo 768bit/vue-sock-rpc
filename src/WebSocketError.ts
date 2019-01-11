@@ -4,7 +4,7 @@ import {
   WebSocketMessageTypeToString,
   WebSocketRequestBody,
   WebSocketResponseBody
-} from "./types";
+} from "./inttypes";
 
 export default class extends Error {
 
