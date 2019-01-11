@@ -335,7 +335,7 @@ export default class {
           if (st.indexOf(handler) >= 0) {
             return Promise.reject(new Error("Handler already registered for pub/sub for topic: " + topic));
           } else {
-            st.push(handler);
+            st.push({ handler : handler });
             return Promise.resolve();
           }
         } else {
@@ -343,7 +343,7 @@ export default class {
           return self.sendRequest.call(self, req).then(() => {
 
             //subscribe and add topic to subscriptions...
-            self.subscriptions.set(topic, [handler]);
+            self.subscriptions.set(topic, [{ handler : handler }]);
 
           });
         }
@@ -366,7 +366,12 @@ export default class {
         }
         if (self.subscriptions.has(topic)) {
           let st = self.subscriptions.get(topic);
-          let ind = st.indexOf(handler);
+          let ind = st.reduce((i: number, listener: { handler: any }, index: number) => {
+            if (typeof listener.handler === 'function' && listener.handler === handler) {
+              i = index;
+            }
+            return i;
+          }, -1);
           if (ind >= 0) {
             self.subscriptions.set(topic, st.splice(ind, 1));
             if (self.subscriptions.get(topic).length === 0) {

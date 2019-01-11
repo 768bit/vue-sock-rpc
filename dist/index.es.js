@@ -727,7 +727,7 @@ var default_1$3 = /** @class */ (function () {
                         return reject(new Error("Handler already registered for pub/sub for topic: " + topic));
                     }
                     else {
-                        st.push(handler);
+                        st.push({ handler: handler });
                         return resolve();
                     }
                 }
@@ -735,7 +735,7 @@ var default_1$3 = /** @class */ (function () {
                     var req = WebSocketRequest.Subscribe(topic);
                     return self.sendRequest.call(self, req).then(function () {
                         //subscribe and add topic to subscriptions...
-                        self.subscriptions.set(topic, [handler]);
+                        self.subscriptions.set(topic, [{ handler: handler }]);
                     });
                 }
             };
@@ -755,7 +755,12 @@ var default_1$3 = /** @class */ (function () {
                 }
                 if (self.subscriptions.has(topic)) {
                     var st = self.subscriptions.get(topic);
-                    var ind = st.indexOf(handler);
+                    var ind = st.reduce(function (i, listener, index) {
+                        if (typeof listener.handler === 'function' && listener.handler === handler) {
+                            i = index;
+                        }
+                        return i;
+                    }, -1);
                     if (ind >= 0) {
                         self.subscriptions.set(topic, st.splice(ind, 1));
                         if (self.subscriptions.get(topic).length === 0) {
