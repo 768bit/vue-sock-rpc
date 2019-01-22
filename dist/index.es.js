@@ -614,8 +614,9 @@ var default_1$3 = /** @class */ (function () {
                 return reject(new Error("Error Attempting to Authenticate and Authorise the WebSocket Session."));
             }
         }).catch(function (ex) {
+            console.error(ex);
             window.location.replace("/_auth/logout?req_path=" + encodeURIComponent(window.location.pathname + window.location.search + window.location.hash));
-            throw ex;
+            return;
         });
     };
     default_1$$1.prototype.onConnected = function (event) {
