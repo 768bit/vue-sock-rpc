@@ -150,10 +150,12 @@ var default_1 = /** @class */ (function () {
                             resolve$$1(parsed);
                         }
                         catch (ex) {
+                            console.error("Parse Error. Response:", anHttpRequest.responseText);
                             reject$$1(ex);
                         }
                     }
                     else {
+                        console.error("Error Code:", anHttpRequest.status, "Response:", anHttpRequest.responseText);
                         reject$$1(anHttpRequest.responseText);
                     }
                 }

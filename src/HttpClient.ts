@@ -87,9 +87,11 @@ export default class {
               let parsed = JSON.parse(anHttpRequest.responseText);
               resolve(parsed);
             } catch (ex) {
+              console.error("Parse Error. Response:", anHttpRequest.responseText);
               reject(ex);
             }
           } else {
+            console.error("Error Code:", anHttpRequest.status, "Response:", anHttpRequest.responseText);
             reject(anHttpRequest.responseText);
           }
         }
