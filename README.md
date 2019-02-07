@@ -75,6 +75,16 @@ export default {
       //process the response...
     });
     
+    //SUBSCRIBE TO AN EVENT (SERVER IMPLEMENTATION REQUIRED)
+    
+    this.$socket.subscribe("topic_name_or_id", (data) => {
+      //process broadcasted data..
+    });
+    
+    //UNSUBSCRIBE FROM AN EVENT
+    
+    this.$socket.unsubscribe("topic_name_or_id", /* OPTIONAL HANDLER SO ONLY THE SUPPLIED HANDLER IS UNSUBSCRIBED */);
+    
   }
 }
 
