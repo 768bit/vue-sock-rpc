@@ -3,16 +3,16 @@ Hard fork of [nathantsoi/vue-native-websocket](https://github.com/nathantsoi) th
 rpc calls over Socket.IO. The back end server needs to support the below message format but it is possible to make HTTP calls or RPC style calls
 using this vue module. This module was not written to support Vuex like [nathantsoi/vue-native-websocket](https://github.com/nathantsoi) but could be extended to support it easily.
 
-##Features
+## Features
 - Written in and Supports Typescript
 - Uses bluebird Promises library
 - Supports Sessions
 - Pub/Sub Support
 
-##Requirements
+## Requirements
 - Needs a supporting back end server. We used Go.
 
-##Install
+## Install
 ``` bash
 yarn add @768bit/vue-sock-rpc
 
@@ -21,9 +21,9 @@ yarn add @768bit/vue-sock-rpc
 npm install @768bit/vue-sock-rpc --save
 ```
 
-##Vue API
+## Vue API
 
-###Configuration
+### Configuration
 ``` js
 import VueSockRPC from '@768bit/vue-sock-rpc'
 
@@ -37,7 +37,7 @@ const socket_options = {
 
 Vue.use(VueSockRPC, webSocketURL, socket_options);
 ```
-###Additional Options
+### Additional Options
 ``` js
 //Web Socket also supports the following options (these haven't been fully tested and are disabled by default)
 
@@ -49,7 +49,7 @@ const socket_options = {
 };
 ```
 
-###Using the API from a Vue component
+### Using the API from a Vue component
 ```js
 <script>
 
@@ -82,9 +82,9 @@ export default {
 
 ```
 
-###Messaging Protocol
+### Messaging Protocol
 In order to support RPC calls and pub/sub functionality above the client builds messages that conform to the following format. 
-####Message types
+#### Message types
 These message types are used in both requests and responses. 
 ```typescript
 enum WebSocketMessageType {
@@ -106,7 +106,7 @@ enum WebSocketMessageType {
   BasicMessage = 0xFF //a basic message - we only need an id and payload for this...
 }
 ```
-####Request Message Format
+#### Request Message Format
 ```typescript
 declare type WebSocketRequestBody = {
   messageType: WebSocketMessageType //Message type
@@ -123,7 +123,7 @@ declare type WebSocketRequestBody = {
                 // page of results we want to return
 }
 ```
-####Message Response Status Codes
+#### Message Response Status Codes
 ```typescript
 enum WebSocketMessageStatus {
   RPCStatusOK = 0x00C8, //200
@@ -133,7 +133,7 @@ enum WebSocketMessageStatus {
   RPCStatusRequestCancelled = 0x029E  //670
 }
 ```
-####Response Message Format
+#### Response Message Format
 ```typescript
 declare type WebSocketResponseBody = {
   messageType: WebSocketMessageType //Message type
@@ -151,5 +151,5 @@ declare type WebSocketResponseBody = {
   errors?: Error[] | string[] //any errors that occurred during the request
 }
 ```
-####HTTP Requests
+#### HTTP Requests
 The backend we built this client to talk to includes the option of running HTTP requests. This client doesn't currently support that but will do in the next release and will conform to the protocols outlined above.
